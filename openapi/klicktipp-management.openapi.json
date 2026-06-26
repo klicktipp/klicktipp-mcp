@@ -1,0 +1,1800 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "KlickTipp API",
+        "description": "This OpenAPI specification describes the KlickTipp REST API.\n\nIt is intended for developers and integrators who want to interact directly with KlickTipp to manage contacts, tags, custom fields, opt-in processes, and related automation workflows. The API can be used standalone or through third-party platforms.\n\nThe specification focuses on correct request formats, authentication mechanisms, response structures, and error handling to ensure reliable and predictable integrations.\n\n## Base URL\n\nThe base URL for the KlickTipp API production environment is:\n\n```\nhttps://api.klicktipp.com/\n```\n\nAll endpoints defined in this specification are relative to this base URL.\n\n## Getting Started\n\nTo access the API, you must authenticate and maintain a valid session.\n\n1. **Authentication**  \n   Most endpoints require cookie-based authentication. Use the login endpoint with your KlickTipp username and password to obtain a session cookie. This cookie must be sent with all subsequent requests.\n\n2. **Request Preparation**  \n   Replace all placeholder values such as email addresses, IDs, or timestamps with valid test data. Invalid formats are a common source of errors.\n\n3. **Response Handling**  \n   The API returns structured error codes and payloads. Always validate HTTP status codes and response bodies programmatically.\n\n## Authentication Overview\n\nThe KlickTipp API supports multiple authentication models depending on the use case.\n\n- **Username and password** authentication via session cookie is typically used for internal tools and administrative workflows.\nDocumentation: [KlickTipp REST API](https://www.klicktipp.com/support/knowledge-base/api-function-overview/)\n\n- **Developer key and customer key** authentication is intended for long-running, production-grade, or multi-tenant integrations and does not rely on sessions.  \nDocumentation: [Developer + Customer Key Integration](https://www.klicktipp.com/support/knowledge-base/api-connection-with-developer-and-customer-key/)\n\n## Response Format\n\nThe KlickTipp API uses JSON as its response format.\n\nAll endpoints defined in this specification are expected to be consumed as JSON and return JSON responses, including all meta information such as timestamps and structured error details.\n\n## Data Formats and Validation\n\nDate and time values must always be provided as Unix timestamps in seconds. Formatted date strings and locale-specific formats are not supported.\n\nIncorrect field formats are a frequent cause of validation errors. Always ensure that values match the expected field type definitions.\n\n## Error Handling\n\nErrors are typically returned with HTTP status code 406 and include a numeric error code in the response body. Integrations should handle these errors explicitly and provide meaningful diagnostics.\n\nThis specification is designed to help you build stable, predictable, and maintainable integrations with the KlickTipp platform.\n",
+        "version": "0.0.0"
+    },
+    "servers": [
+        {
+            "url": "https://app.ktlocal.com/api",
+            "description": "KlickTipp REST API (Local)"
+        },
+        {
+            "url": "https://app.klicktipp-staging.com/api",
+            "description": "KlickTipp REST API (Staging)"
+        },
+        {
+            "url": "https://api.klicktipp.com",
+            "description": "KlickTipp REST API"
+        }
+    ],
+    "paths": {
+        "/account/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login",
+                "description": "Logs into the API and retrieves session details for further interactions.",
+                "operationId": "api.account.login",
+                "requestBody": {
+                    "description": "User credentials (username and password) for authentication.",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "username",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "username": {
+                                        "description": "The username.",
+                                        "type": "string",
+                                        "example": "{{username}}"
+                                    },
+                                    "password": {
+                                        "description": "The password.",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "{{password}}"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "required": [
+                                    "username",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "username": {
+                                        "description": "The username.",
+                                        "type": "string",
+                                        "example": "{{username}}"
+                                    },
+                                    "password": {
+                                        "description": "The password.",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "{{password}}"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "username",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "username": {
+                                        "description": "The username.",
+                                        "type": "string",
+                                        "example": "{{username}}"
+                                    },
+                                    "password": {
+                                        "description": "The password.",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "{{password}}"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success Response.\n\nReturns session details and account information.\n\nResponse contains a session cookie in the `Set-Cookie` header.\n\nResponse also contains `session_name` and `sessid` in the body for manual usage.",
+                        "headers": {
+                            "Set-Cookie": {
+                                "description": "Session cookie for authentication.",
+                                "schema": {
+                                    "type": "string",
+                                    "example": "SSESSabc=xyz123; path=/; secure; httponly;"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "sessid": {
+                                            "description": "Session ID",
+                                            "type": "string"
+                                        },
+                                        "session_name": {
+                                            "description": "Session name",
+                                            "type": "string"
+                                        },
+                                        "account": {
+                                            "description": "Account information",
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "example": {
+                                    "sessid": "xyz123",
+                                    "session_name": "SSESSabc",
+                                    "account": {
+                                        "uid": 1,
+                                        "status": 1,
+                                        "tier": 20,
+                                        "usergroup": "42",
+                                        "username": "alexexample",
+                                        "email": "alex.example@klicktipp.example",
+                                        "firstname": "Alex",
+                                        "lastname": "Example",
+                                        "company": "Example Corp",
+                                        "country": "DE",
+                                        "street": "Example Street 1",
+                                        "city": "Berlin",
+                                        "state": "Berlin",
+                                        "zip": "10115",
+                                        "website": "https://www.klicktipp.example",
+                                        "affid": "0",
+                                        "phone": "00491234567890",
+                                        "fax": "00491234567890"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequestResponse"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedResponse"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/NotAcceptableResponse"
+                    }
+                }
+            }
+        },
+        "/account/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout from API",
+                "description": "Logout from API",
+                "operationId": "api.account.logout",
+                "responses": {
+                    "200": {
+                        "description": "Success Response."
+                    }
+                }
+            }
+        },
+        "/field": {
+            "get": {
+                "tags": [
+                    "Data Fields"
+                ],
+                "summary": "List Data Fields",
+                "description": "Lists the IDs and names of all data fields.\n\n**Notice:** data field IDs in this endpoint are prefixed with `field`.",
+                "operationId": "api.customfield.index",
+                "responses": {
+                    "200": {
+                        "description": "Success Response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                },
+                                "example": {
+                                    "fieldFirstName": "Alex",
+                                    "fieldLastName": "Example",
+                                    "fieldCompanyName": "Example Corp",
+                                    "fieldStreet1": "Example Street 1",
+                                    "fieldStreet2": "",
+                                    "fieldCity": "Berlin",
+                                    "fieldState": "Berlin",
+                                    "fieldZip": "10115",
+                                    "fieldCountry": "DE",
+                                    "fieldPrivatePhone": "+491701234567",
+                                    "fieldMobilePhone": "+491701234567",
+                                    "fieldPhone": "+492201234567",
+                                    "fieldFax": "4922012345678",
+                                    "fieldWebsite": "https://www.klicktipp.example",
+                                    "fieldBirthday": "755222400",
+                                    "fieldLeadValue": "100",
+                                    "field12345": "Custom Field Value"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    }
+                }
+            }
+        },
+        "/field/{fieldid}": {
+            "get": {
+                "tags": [
+                    "Data Fields"
+                ],
+                "summary": "Get Data Field",
+                "description": "Gets the ID and the name of a data field.",
+                "operationId": "api.customfield.retrieve",
+                "parameters": [
+                    {
+                        "name": "fieldid",
+                        "in": "path",
+                        "description": "Data field ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success Response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "description": "Tag ID",
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "description": "Tag name",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "example": {
+                                    "id": "12345",
+                                    "name": "Custom Field Value"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundResponse"
+                    }
+                }
+            }
+        },
+        "/list": {
+            "get": {
+                "tags": [
+                    "Opt-In Processes"
+                ],
+                "summary": "List Opt-in Processes",
+                "description": "Lists the IDs and names of all opt-in processes.\n\n**Notice:** The Id without a name is the Default Double Opt-In present in each KlickTipp Account.",
+                "operationId": "api.optin.index",
+                "responses": {
+                    "200": {
+                        "description": "Success Response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                },
+                                "example": {
+                                    "3": "",
+                                    "23": "my-optin-process"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    }
+                }
+            }
+        },
+        "/list/{listid}": {
+            "get": {
+                "tags": [
+                    "Opt-In Processes"
+                ],
+                "summary": "Get Opt-in Process",
+                "description": "Returns the complete data of an opt-in process.",
+                "operationId": "api.optin.retrieve",
+                "parameters": [
+                    {
+                        "name": "listid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "pattern": "\\d+"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success Response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "listid": {
+                                            "description": "The list id",
+                                            "type": "integer",
+                                            "example": 16
+                                        },
+                                        "name": {
+                                            "description": "The list name",
+                                            "type": "string",
+                                            "example": "my optin process"
+                                        },
+                                        "usesingleoptin": {
+                                            "description": "Use single opt-in",
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "pendingurl": {
+                                            "description": "Pending url",
+                                            "type": "string",
+                                            "example": "https://mypending.com"
+                                        },
+                                        "thankyouurl": {
+                                            "description": "Thank you url",
+                                            "type": "string",
+                                            "example": "https://mythankyou.com"
+                                        },
+                                        "resendconfirmationemail": {
+                                            "description": "Resend confirmation email",
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "usechangeemail": {
+                                            "description": "Use change email",
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundResponse"
+                    }
+                }
+            }
+        },
+        "/list/redirect": {
+            "post": {
+                "tags": [
+                    "Opt-In Processes"
+                ],
+                "summary": "Search Redirect URL",
+                "description": "Search the redirection URL for a specific opt-in process.",
+                "operationId": "api.optin.redirect",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OptInProcessRedirectSchema"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OptInProcessRedirectSchema"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/OptInProcessRedirectSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success Response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "example": [
+                                    "https://mypendingurl.com"
+                                ]
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundResponse"
+                    }
+                }
+            }
+        },
+        "/subscriber": {
+            "get": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "List Contacts",
+                "description": "Lists the IDs of all contacts.",
+                "operationId": "api.subscriber.index",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by subscriber status (pending, subscribed, unsubscribed)",
+                        "required": false,
+                        "explode": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "name": "bounceStatus",
+                        "in": "query",
+                        "description": "Filter by bounce status (hardbounce, softbounce, spambounce, nobounce)",
+                        "required": false,
+                        "explode": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success Response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "subscribers": {
+                                            "description": "Array of subscribers",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "example": {
+                                    "subscribers": [
+                                        "123",
+                                        "456"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundResponse"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Add or Update Contact",
+                "description": "Adds a new contact. If a contact with the same email already exists, it will be updated.",
+                "operationId": "api.subscriber.create",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberCreateSchema"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberCreateSchema"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberCreateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success Response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SubscriberDetailSchema"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/NotAcceptableResponse"
+                    }
+                }
+            }
+        },
+        "/subscriber/{subscriberid}": {
+            "get": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Get Contact",
+                "description": "Returns the complete data of a contact.",
+                "operationId": "api.subscriber.retrieve",
+                "parameters": [
+                    {
+                        "name": "subscriberid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success Response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SubscriberDetailSchema"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundResponse"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Update Contact",
+                "description": "Updates a contact.",
+                "operationId": "api.subscriber.update",
+                "parameters": [
+                    {
+                        "name": "subscriberid",
+                        "in": "path",
+                        "description": "Contact ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberUpdateSchema"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberUpdateSchema"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberUpdateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/SuccessBooleanResponse"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/NotAcceptableResponse"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Delete Contact",
+                "description": "Deletes a contact.",
+                "operationId": "api.subscriber.delete",
+                "parameters": [
+                    {
+                        "name": "subscriberid",
+                        "in": "path",
+                        "description": "Contact ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/SuccessBooleanResponse"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/NotAcceptableResponse"
+                    }
+                }
+            }
+        },
+        "/subscriber/unsubscribe": {
+            "post": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Unsubscribe Contact",
+                "description": "Unsubscribes a contact, preventing further communication.",
+                "operationId": "api.subscriber.unsubscribe",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberUnsubscribeSchema"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberUnsubscribeSchema"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberUnsubscribeSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/SuccessBooleanResponse"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/NotAcceptableResponse"
+                    }
+                }
+            }
+        },
+        "/subscriber/tag": {
+            "post": {
+                "tags": [
+                    "Contact Tagging"
+                ],
+                "summary": "Tag Contact",
+                "description": "Adds one or more tags to a contact.",
+                "operationId": "api.subscriber.tag",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberTagSchema"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberTagSchema"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberTagSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/SuccessBooleanResponse"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/NotAcceptableResponse"
+                    }
+                }
+            }
+        },
+        "/subscriber/untag": {
+            "post": {
+                "tags": [
+                    "Contact Tagging"
+                ],
+                "summary": "Untag Contact",
+                "description": "Removes a tag from a contact.",
+                "operationId": "api.subscriber.untag",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberUntagSchema"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberUntagSchema"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberUntagSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/SuccessBooleanResponse"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/NotAcceptableResponse"
+                    }
+                }
+            }
+        },
+        "/subscriber/search": {
+            "post": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Search Contact ID",
+                "description": "Returns the contact ID for an email address.",
+                "operationId": "api.subscriber.search",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberSearchSchema"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberSearchSchema"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberSearchSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success Response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "example": [
+                                    3
+                                ]
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundResponse"
+                    }
+                }
+            }
+        },
+        "/subscriber/tagged": {
+            "post": {
+                "tags": [
+                    "Contacts"
+                ],
+                "summary": "Search Tagged Contacts",
+                "description": "Returns the IDs and tagging timestamps of all tagged contacts.",
+                "operationId": "api.subscriber.tagged",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberTaggedSchema"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberTaggedSchema"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SubscriberTaggedSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success Response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                },
+                                "example": {
+                                    "3": "1760530436"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    }
+                }
+            }
+        },
+        "/tag": {
+            "get": {
+                "tags": [
+                    "Tags"
+                ],
+                "summary": "List Tags",
+                "description": "Lists the IDs and names of all tags.",
+                "operationId": "api.tag.index",
+                "responses": {
+                    "200": {
+                        "description": "Success Response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                },
+                                "example": {
+                                    "21": "mytag",
+                                    "23": "example"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Tags"
+                ],
+                "summary": "Create Tag",
+                "description": "Creates a new manual tag.",
+                "operationId": "api.tag.create",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TagCreateSchema"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TagCreateSchema"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TagCreateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success Response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "example": [
+                                    49
+                                ]
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/NotAcceptableResponse"
+                    }
+                }
+            }
+        },
+        "/tag/{tagid}": {
+            "get": {
+                "tags": [
+                    "Tags"
+                ],
+                "summary": "Get Tag",
+                "description": "Returns the name and description of a tag.",
+                "operationId": "api.tag.retrieve",
+                "parameters": [
+                    {
+                        "name": "tagid",
+                        "in": "path",
+                        "description": "Tag ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "pattern": "\\d+"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success Response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "tagid": {
+                                            "description": "Tag ID",
+                                            "type": "string"
+                                        },
+                                        "name": {
+                                            "description": "Tag name",
+                                            "type": "string"
+                                        },
+                                        "text": {
+                                            "description": "Tag description",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "example": {
+                                    "tagid": "21",
+                                    "name": "mytag",
+                                    "text": "some text"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundResponse"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Tags"
+                ],
+                "summary": "Update Tag",
+                "description": "Updates a tag.",
+                "operationId": "api.tag.update",
+                "parameters": [
+                    {
+                        "name": "tagid",
+                        "in": "path",
+                        "description": "Tag ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "pattern": "\\d+"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TagUpdateSchema"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TagUpdateSchema"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TagUpdateSchema"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/SuccessBooleanResponse"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundResponse"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/NotAcceptableResponse"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Tags"
+                ],
+                "summary": "Delete Tag",
+                "description": "Deletes a tag and removes it from all contacts.",
+                "operationId": "api.tag.delete",
+                "parameters": [
+                    {
+                        "name": "tagid",
+                        "in": "path",
+                        "description": "Tag ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "pattern": "\\d+"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/SuccessBooleanResponse"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/AccessDeniedResponse"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFoundResponse"
+                    },
+                    "406": {
+                        "$ref": "#/components/responses/NotAcceptableResponse"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "OptInProcessRedirectSchema": {
+                "required": [
+                    "listid",
+                    "email"
+                ],
+                "properties": {
+                    "listid": {
+                        "description": "OptIn-Process ID.",
+                        "type": "string",
+                        "example": "45"
+                    },
+                    "email": {
+                        "description": "Contact email.",
+                        "type": "string",
+                        "example": "hello@example.com"
+                    }
+                },
+                "type": "object"
+            },
+            "SubscriberCreateSchema": {
+                "properties": {
+                    "email": {
+                        "description": "Valid email address and must contain `@`.\n\nEither `email` or `smsnumber` is required.\nEmail address must be unique per contact.",
+                        "type": "string",
+                        "example": "alex.example@klicktipp.example",
+                        "nullable": true
+                    },
+                    "smsnumber": {
+                        "description": "Phone number in international format.\n\nEither `email` or `smsnumber` is required.\nSMS number must be unique per contact.\n\n  Accepted input:\n  - `+4912345678`\n  - `004912345678`\n\n  Stored format:\n- `004912345678`",
+                        "type": "string",
+                        "example": "+491701234567",
+                        "nullable": true
+                    },
+                    "listid": {
+                        "description": "Opt-in process ID.\n\nIf provided, this opt-in process is used.\nIf omitted, the predefined double opt-in process is triggered automatically, which may trigger an email to the contact.\n\nRetrieve available opt-in process IDs via `GET /list`.",
+                        "type": "integer",
+                        "example": 12345,
+                        "nullable": true
+                    },
+                    "tagid": {
+                        "description": "Tag ID assigned to the contact.\n\nUsed for segmentation and automation triggers.\nRetrieve available tag IDs via `GET /tag`.",
+                        "type": "integer",
+                        "example": 56789,
+                        "nullable": true
+                    },
+                    "fields": {
+                        "description": "Additional custom fields for the subscriber.\n\nKeys must match the field names configured in KlickTipp.\nEach field expects a specific data format depending on its field type.\n\n- `Line`: Single-line text without line breaks.\n  Example: `Alex Example`\n- `Paragraph`: Text with paragraphs. Use `\\n` to separate paragraphs.\n  Example: `Dies ist ein Text.\\nMit Absatz.`\n- `Number`: Integer value. No dot, no comma.\n  Example: `42`\n- `Decimal Number`: Decimal value. Output always uses a dot as decimal separator.\n  Example: Input `1999` \u2192 Output `19.99`\n- `URL`: Valid web address. Must start with `http://` or `https://`.\n  Example: `https://klicktipp.com`\n- `Time`: Unix timestamp between `0` and `86399` (seconds since midnight).\n  Example: `52200` (14:30 GMT)\n- `Date`: Unix timestamp in seconds. Date formats like `DD.MM.YYYY` are not supported.\n  Example: `1715126400` (08.05.2024 GMT)\n- `Date & Time`: Unix timestamp in seconds. Do not send formatted date strings or values with spaces.\n  Example: `1715603400` (13.05.2024 12:30:00 GMT)\n- `HTML`: HTML-formatted content. Only use this type if the field explicitly allows HTML.\n  Example: `<strong>Hello World</strong>`",
+                        "type": "object",
+                        "example": {
+                            "fieldFirstName": "Alex",
+                            "fieldLastName": "Example",
+                            "fieldCompanyName": "Example Corp",
+                            "fieldStreet1": "Example Street 1",
+                            "fieldStreet2": "",
+                            "fieldCity": "Berlin",
+                            "fieldState": "Berlin",
+                            "fieldZip": "10115",
+                            "fieldCountry": "DE",
+                            "fieldPrivatePhone": "+491701234567",
+                            "fieldMobilePhone": "+491701234567",
+                            "fieldPhone": "+492201234567",
+                            "fieldFax": "4922012345678",
+                            "fieldWebsite": "https://www.klicktipp.example",
+                            "fieldBirthday": "755222400",
+                            "fieldLeadValue": "100",
+                            "field12345": "Custom Field Value"
+                        },
+                        "nullable": true,
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "SubscriberDetailSchema": {
+                "required": [
+                    "id",
+                    "listid",
+                    "optin",
+                    "optin_ip",
+                    "email",
+                    "status",
+                    "bounce",
+                    "date",
+                    "ip",
+                    "unsubscription",
+                    "unsubscription_ip",
+                    "referrer",
+                    "sms_phone",
+                    "sms_status",
+                    "sms_bounce",
+                    "sms_date",
+                    "sms_unsubscription",
+                    "fieldFirstName",
+                    "fieldLastName",
+                    "fieldCompanyName",
+                    "fieldStreet1",
+                    "fieldStreet2",
+                    "fieldCity",
+                    "fieldState",
+                    "fieldZip",
+                    "fieldCountry",
+                    "fieldPrivatePhone",
+                    "fieldMobilePhone",
+                    "fieldPhone",
+                    "fieldFax",
+                    "fieldWebsite",
+                    "fieldBirthday",
+                    "fieldLeadValue",
+                    "tags",
+                    "smart_tags",
+                    "notification_emails_sent",
+                    "notification_emails_opened",
+                    "notification_emails_clicked",
+                    "manual_tags",
+                    "emails_sent",
+                    "emails_opened",
+                    "emails_clicked",
+                    "campaigns_started",
+                    "campaigns_finished"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "listid": {
+                        "type": "string",
+                        "example": "12345"
+                    },
+                    "optin": {
+                        "type": "string",
+                        "example": "25.09.2025"
+                    },
+                    "optin_ip": {
+                        "type": "string",
+                        "example": "0.0.0.0"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "t1@example.com"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "Subscribed"
+                    },
+                    "bounce": {
+                        "type": "string",
+                        "example": "Not Bounced"
+                    },
+                    "date": {
+                        "type": "string",
+                        "example": "25.09.2025"
+                    },
+                    "ip": {
+                        "type": "string",
+                        "example": "0.0.0.0"
+                    },
+                    "unsubscription": {
+                        "type": "string",
+                        "example": ""
+                    },
+                    "unsubscription_ip": {
+                        "type": "string",
+                        "example": "0.0.0.0"
+                    },
+                    "referrer": {
+                        "type": "string",
+                        "example": ""
+                    },
+                    "sms_phone": {
+                        "type": "string",
+                        "example": "004968211034234"
+                    },
+                    "sms_status": {
+                        "type": "string",
+                        "example": "Subscribed"
+                    },
+                    "sms_bounce": {
+                        "type": "string",
+                        "example": "Not Bounced"
+                    },
+                    "sms_date": {
+                        "type": "string",
+                        "example": "15.12.2025"
+                    },
+                    "sms_unsubscription": {
+                        "type": "string",
+                        "example": ""
+                    },
+                    "sms_referrer": {
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "fieldFirstName": {
+                        "type": "string",
+                        "example": "Alex"
+                    },
+                    "fieldLastName": {
+                        "type": "string",
+                        "example": "Example"
+                    },
+                    "fieldCompanyName": {
+                        "type": "string",
+                        "example": "Example Corp"
+                    },
+                    "fieldStreet1": {
+                        "type": "string",
+                        "example": "Example Street 1"
+                    },
+                    "fieldStreet2": {
+                        "type": "string",
+                        "example": ""
+                    },
+                    "fieldCity": {
+                        "type": "string",
+                        "example": "Berlin"
+                    },
+                    "fieldState": {
+                        "type": "string",
+                        "example": "Berlin"
+                    },
+                    "fieldZip": {
+                        "type": "string",
+                        "example": "10115"
+                    },
+                    "fieldCountry": {
+                        "type": "string",
+                        "example": "DE"
+                    },
+                    "fieldPrivatePhone": {
+                        "type": "string",
+                        "example": "00491701234567"
+                    },
+                    "fieldMobilePhone": {
+                        "type": "string",
+                        "example": "00491701234567"
+                    },
+                    "fieldPhone": {
+                        "type": "string",
+                        "example": "004968211034234"
+                    },
+                    "fieldFax": {
+                        "type": "string",
+                        "example": "004922012345678"
+                    },
+                    "fieldWebsite": {
+                        "type": "string",
+                        "example": "https://www.klicktipp.example"
+                    },
+                    "fieldBirthday": {
+                        "type": "string",
+                        "example": "755222400"
+                    },
+                    "fieldLeadValue": {
+                        "type": "string",
+                        "example": "100"
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "17",
+                            "18"
+                        ]
+                    },
+                    "smart_tags": {
+                        "type": "object",
+                        "example": {
+                            "17": "1758821945",
+                            "18": "1758822131"
+                        }
+                    },
+                    "notification_emails_sent": {
+                        "type": "object",
+                        "example": {
+                            "45": "1758821945"
+                        }
+                    },
+                    "notification_emails_opened": {
+                        "type": "object",
+                        "example": {
+                            "45": "1758822131"
+                        }
+                    },
+                    "notification_emails_clicked": {
+                        "type": "object",
+                        "example": {
+                            "45": "1758822131"
+                        }
+                    },
+                    "manual_tags": {
+                        "type": "object",
+                        "example": {
+                            "21": "1759753677"
+                        }
+                    },
+                    "emails_sent": {
+                        "type": "object",
+                        "example": {
+                            "1": "1758822606",
+                            "2": "1758822769"
+                        }
+                    },
+                    "emails_opened": {
+                        "type": "object",
+                        "example": {
+                            "1": "1758822610",
+                            "2": "1758884682"
+                        }
+                    },
+                    "emails_clicked": {
+                        "type": "object",
+                        "example": {
+                            "1": "1758822733"
+                        }
+                    },
+                    "campaigns_started": {
+                        "type": "object",
+                        "example": {
+                            "6": "1759753673"
+                        }
+                    },
+                    "campaigns_finished": {
+                        "type": "object",
+                        "example": {
+                            "6": "1759753677"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "SubscriberUpdateSchema": {
+                "properties": {
+                    "newemail": {
+                        "description": "Valid email address and must contain `@`.\n\nEither `email` or `smsnumber` is required.\nEmail address must be unique per contact.",
+                        "type": "string",
+                        "example": "alex.example@klicktipp.example",
+                        "nullable": true
+                    },
+                    "newsmsnumber": {
+                        "description": "Phone number in international format.\n\nEither `email` or `smsnumber` is required.\nSMS number must be unique per contact.\n\n  Accepted input:\n  - `+4912345678`\n  - `004912345678`\n\n  Stored format:\n- `004912345678`",
+                        "type": "string",
+                        "example": "+491701234567",
+                        "nullable": true
+                    },
+                    "fields": {
+                        "description": "Additional custom fields for the subscriber.\n\nKeys must match the field names configured in KlickTipp.\nEach field expects a specific data format depending on its field type.\n\n- `Line`: Single-line text without line breaks.\n  Example: `Alex Example`\n- `Paragraph`: Text with paragraphs. Use `\\n` to separate paragraphs.\n  Example: `Dies ist ein Text.\\nMit Absatz.`\n- `Number`: Integer value. No dot, no comma.\n  Example: `42`\n- `Decimal Number`: Decimal value. Output always uses a dot as decimal separator.\n  Example: Input `1999` \u2192 Output `19.99`\n- `URL`: Valid web address. Must start with `http://` or `https://`.\n  Example: `https://klicktipp.com`\n- `Time`: Unix timestamp between `0` and `86399` (seconds since midnight).\n  Example: `52200` (14:30 GMT)\n- `Date`: Unix timestamp in seconds. Date formats like `DD.MM.YYYY` are not supported.\n  Example: `1715126400` (08.05.2024 GMT)\n- `Date & Time`: Unix timestamp in seconds. Do not send formatted date strings or values with spaces.\n  Example: `1715603400` (13.05.2024 12:30:00 GMT)\n- `HTML`: HTML-formatted content. Only use this type if the field explicitly allows HTML.\n  Example: `<strong>Hello World</strong>`",
+                        "type": "object",
+                        "example": {
+                            "fieldFirstName": "Alex",
+                            "fieldLastName": "Example",
+                            "fieldCompanyName": "Example Corp",
+                            "fieldStreet1": "Example Street 1",
+                            "fieldStreet2": "",
+                            "fieldCity": "Berlin",
+                            "fieldState": "Berlin",
+                            "fieldZip": "10115",
+                            "fieldCountry": "DE",
+                            "fieldPrivatePhone": "+491701234567",
+                            "fieldMobilePhone": "+491701234567",
+                            "fieldPhone": "+492201234567",
+                            "fieldFax": "4922012345678",
+                            "fieldWebsite": "https://www.klicktipp.example",
+                            "fieldBirthday": "755222400",
+                            "fieldLeadValue": "100",
+                            "field12345": "Custom Field Value"
+                        },
+                        "nullable": true,
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "SubscriberUnsubscribeSchema": {
+                "required": [
+                    "email"
+                ],
+                "properties": {
+                    "email": {
+                        "description": "Email address of the subscriber",
+                        "type": "string",
+                        "example": "alex.example@klicktipp.example"
+                    }
+                },
+                "type": "object"
+            },
+            "SubscriberTagSchema": {
+                "required": [
+                    "email",
+                    "tagids"
+                ],
+                "properties": {
+                    "email": {
+                        "description": "Email address of the subscriber",
+                        "type": "string",
+                        "example": "alex.example@klicktipp.example"
+                    },
+                    "tagids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "example": [
+                            17,
+                            18
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "SubscriberUntagSchema": {
+                "required": [
+                    "email",
+                    "tagid"
+                ],
+                "properties": {
+                    "email": {
+                        "description": "Email address of the subscriber",
+                        "type": "string",
+                        "example": "alex.example@klicktipp.example"
+                    },
+                    "tagid": {
+                        "type": "integer",
+                        "example": 17
+                    }
+                },
+                "type": "object"
+            },
+            "SubscriberSearchSchema": {
+                "required": [
+                    "email"
+                ],
+                "properties": {
+                    "email": {
+                        "description": "Email address of the subscriber",
+                        "type": "string",
+                        "example": "alex.example@klicktipp.example"
+                    }
+                },
+                "type": "object"
+            },
+            "SubscriberTaggedSchema": {
+                "required": [
+                    "tagid",
+                    "status",
+                    "bounceStatus"
+                ],
+                "properties": {
+                    "tagid": {
+                        "type": "integer",
+                        "example": 17
+                    },
+                    "status": {
+                        "description": "Filter by subscriber status (pending, subscribed, unsubscribed)",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "subscribed",
+                            "pending"
+                        ]
+                    },
+                    "bounceStatus": {
+                        "description": "Filter by bounce status (hardbounce, softbounce, spambounce, nobounce)",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "nobounce",
+                            "softbounce"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "TagCreateSchema": {
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Tag name.",
+                        "type": "string",
+                        "example": "mynewtag"
+                    },
+                    "text": {
+                        "description": "Tag description.",
+                        "type": "string",
+                        "example": "hello",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "TagUpdateSchema": {
+                "properties": {
+                    "name": {
+                        "description": "Tag name.",
+                        "type": "string",
+                        "example": "mynewtag",
+                        "nullable": true
+                    },
+                    "text": {
+                        "description": "Tag description.",
+                        "type": "string",
+                        "example": "hello",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "responses": {
+            "SuccessBooleanResponse": {
+                "description": "Success Response (200).",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "boolean"
+                            },
+                            "example": [
+                                true
+                            ]
+                        }
+                    }
+                }
+            },
+            "BadRequestResponse": {
+                "description": "Bad Request Response (400).\n\nCheck your request for malformed or missing parameters.\n",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "example": [
+                            "The key \"username\" must be a string."
+                        ]
+                    }
+                }
+            },
+            "UnauthorizedResponse": {
+                "description": "Unauthorized Response (401).\n\nCheck username and password, or possibly other required parameters.\n",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "example": [
+                            "Wrong username or password."
+                        ]
+                    }
+                }
+            },
+            "AccessDeniedResponse": {
+                "description": "Access Denied Response (403).\n\nYour account does not have the required permissions to access this resource.\n",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "example": [
+                            "API access denied."
+                        ]
+                    }
+                }
+            },
+            "NotFoundResponse": {
+                "description": "Not Found Response (404).\n\nThe specified resource could not be found.\n",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "example": [
+                            "There is no such entity."
+                        ]
+                    }
+                }
+            },
+            "NotAcceptableResponse": {
+                "description": "Not Acceptable Response (406).\n\nCheck the response content for further error details.\n\nIn some cases, a detail error code may be returned:\n\n- `4` - Subscription not found\n- `5` - Email address validation failed\n- `7` - Subscriber email not found\n- `8` - Field validation failed\n- `9` - Subscriber not subscribed\n- `10` - Subscriber update failed\n- `30` - Email address change not allowed\n- `31` - Untag smarttag not allowed\n- `32` - Email address SMS number required\n- `100` - Invalid API key\n- `401` - User not found\n- `402` - List not found\n- `403` - Tag not found\n- `404` - User group not found\n- `405` - Campaign not found\n- `406` - Tier not found\n- `501` - Email address required\n- `502` - Username required\n- `503` - Password required\n- `504` - First name required\n- `505` - Last name required\n- `506` - Username exists\n- `507` - Email address exists\n- `508` - User update failed\n",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "oneOf": [
+                                {
+                                    "type": "object"
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            ]
+                        },
+                        "example": {
+                            "error": 507
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Authentication functions"
+        },
+        {
+            "name": "Contacts",
+            "description": "Manage contacts"
+        },
+        {
+            "name": "Contact Tagging",
+            "description": "Tag and untag contacts"
+        },
+        {
+            "name": "Data Fields",
+            "description": "Manage data fields"
+        },
+        {
+            "name": "Opt-In Processes",
+            "description": "Manage opt-in processes"
+        },
+        {
+            "name": "Tags",
+            "description": "Manage tags"
+        }
+    ]
+}

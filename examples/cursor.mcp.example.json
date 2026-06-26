@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "klicktipp": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/klicktipp-mcp-server/src/index.js"
+      ]
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "klicktipp-mcp",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "Local MCP server for a safe KlickTipp Management API subset.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test",
+    "inspect": "npx @modelcontextprotocol/inspector node src/index.js"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "dotenv": "^17.2.3",
+    "zod": "^3.25.76"
+  }
+}
