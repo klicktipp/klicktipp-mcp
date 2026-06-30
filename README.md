@@ -150,6 +150,20 @@ cp .env.example .env
 
 ### 4. Fill in `.env`
 
+Session authentication example read tools only:
+
+```dotenv
+KT_BASE_URL=https://api.klicktipp.com
+KT_TIMEOUT_MS=30000
+KT_AUTH_MODE=session
+KT_TOOL_MODE=readonly
+KT_ENABLE_WRITES=false
+KT_ENABLE_DESTRUCTIVE=false
+KT_AUDIT_LOGS=true
+KT_USERNAME=your-klicktipp-username
+KT_PASSWORD=your-password
+```
+
 Partner authentication example read tools only:
 
 ```dotenv
@@ -163,20 +177,6 @@ KT_AUDIT_LOGS=true
 KT_USERNAME=your-klicktipp-username
 KT_DEVELOPER_KEY=your-developer-key-hex
 KT_CUSTOMER_KEY=your-customer-key
-```
-
-Session authentication example read tools only:
-
-```dotenv
-KT_BASE_URL=https://api.klicktipp.com
-KT_TIMEOUT_MS=30000
-KT_AUTH_MODE=session
-KT_TOOL_MODE=readonly
-KT_ENABLE_WRITES=false
-KT_ENABLE_DESTRUCTIVE=false
-KT_AUDIT_LOGS=true
-KT_USERNAME=your-klicktipp-username
-KT_PASSWORD=your-password
 ```
 
 To enable write tools:
