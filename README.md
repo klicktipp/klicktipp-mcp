@@ -122,10 +122,13 @@ Source documentation used:
 
 ## Requirements
 
-- Node.js 18 or newer
-- a KlickTipp account
-- one supported authentication mode
-- an MCP-compatible client such as Claude Desktop, Codex, or Cursor
+Check these before starting (see `package.json` for exact version constraints):
+
+- Node.js
+- npm
+- git
+
+If anything is missing, apply the smallest safe fix, for example install only the missing tool via your OS package manager or a version manager like `nvm`, rather than upgrading unrelated tooling or changing system-wide defaults.
 
 ## Installation
 
