@@ -142,11 +142,13 @@ cd klicktipp-mcp-server
 npm install
 ```
 
-### 3. Create the environment file
+### 3. Create the environment file and fill in credentials yourself
 
 ```bash
 cp .env.example .env
 ```
+
+Open `.env` in your own editor and fill in the values. Do not paste credentials into a chat or AI assistant, and do not let an AI assistant write them into the file for you.
 
 ### 4. Fill in `.env`
 
@@ -194,6 +196,18 @@ KT_TOOL_MODE=full
 KT_ENABLE_WRITES=true
 KT_ENABLE_DESTRUCTIVE=true
 ```
+
+## AI Coding Agent Guardrails
+
+If you're setting this server up with an AI coding assistant such as Claude Code, Cursor, or Codex:
+
+- Treat `.env` as write-only once created. The agent should never read or print its contents, even to verify it. An existence check such as `test -s .env` is enough.
+- Add a deny rule to the agent's local permission config such as `.claude/settings.json` blocking Read and Bash access to `.env` for this project. Scope it narrowly so `.env.example` stays readable.
+- Do not let an agent write credentials into `.mcp.json` or any other MCP client config without explicitly asking for permission first. This file is not covered by the deny rule above by default.
+- Confirm `.env` is listed in `.gitignore` before the first commit.
+- Start with `KT_TOOL_MODE=readonly`, `KT_ENABLE_WRITES=false`, and `KT_ENABLE_DESTRUCTIVE=false`. Only enable writes or destructive actions after verifying the setup works as expected.
+
+See [AGENTS.md](./AGENTS.md) for the machine-readable version of these instructions.
 
 ## Client configuration
 
